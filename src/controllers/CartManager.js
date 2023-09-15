@@ -4,10 +4,35 @@ const ProductManager = require("./ProductManager.js");
 
 const productAll = new ProductManager();
 
+class BadRequestError extends Error {
+  constructor(message) {
+    super(message);
+    this.statusCode = 400;
+  }
+}
+
+class NotFoundError extends Error {
+  constructor(message) {
+    super(message);
+    this.statusCode = 404;
+  }
+}
+
 class CartManager {
   constructor() {
     this.path = "./src/models/carts.json";
   }
+
+  errorValidation = async (error) => {
+    if (error instanceof BadRequestError || error instanceof NotFoundError) {
+      return {
+        statusCode: error.statusCode,
+        message: error.message,
+      };
+    } else {
+      throw error;
+    }
+  };
 
   readCarts = async () => {
     const carts = await fs.promises.readFile(this.path, "utf-8");
@@ -32,35 +57,49 @@ class CartManager {
   };
 
   getCartByID = async (id) => {
-    let cartExists = await this.exists(id);
-    return !cartExists ? "Cart not found" : cartExists;
+    try {
+      let cartExists = await this.exists(id);
+      if (!cartExists) {
+        throw new NotFoundError("Cart not found");
+      }
+      return cartExists;
+    } catch (error) {
+      return await this.errorValidation(error);
+    }
   };
 
   productToCart = async (cartID, productID) => {
-    let cartExists = await this.exists(cartID);
-    if (!cartExists) return "Cart not found";
+    try {
+      let cartExists = await this.exists(cartID);
+      if (!cartExists) {
+        throw new NotFoundError("Cart not found");
+      }
+      let productById = await productAll.exists(productID);
+      if (!productById) {
+        throw new NotFoundError("Product not found");
+      }
 
-    let productById = await productAll.exists(productID);
-    if (!productById) return "Product not found";
+      let allCarts = await this.readCarts();
+      let cartFilter = allCarts.filter((cart) => cart.id != cartID);
 
-    let allCarts = await this.readCarts();
-    let cartFilter = allCarts.filter((cart) => cart.id != cartID);
+      if (cartExists.products.some((prod) => prod.id === productID)) {
+        let productInCart = cartExists.products.find(
+          (prod) => prod.id === productID
+        );
+        productInCart.quantity++;
+        let cartConcat = [cartExists, ...cartFilter];
+        await this.writeCarts(cartConcat);
+        return "In-cart product updated";
+      }
 
-    if (cartExists.products.some((prod) => prod.id === productID)) {
-      let productInCart = cartExists.products.find(
-        (prod) => prod.id === productID
-      );
-      productInCart.quantity++;
+      cartExists.products.push({ id: productById.id, quantity: 1 });
       let cartConcat = [cartExists, ...cartFilter];
+
       await this.writeCarts(cartConcat);
-      return "In-cart product updated";
+      return "Product was added to the cart";
+    } catch (error) {
+      return await this.errorValidation(error);
     }
-
-    cartExists.products.push({ id: productById.id, quantity: 1 });
-    let cartConcat = [cartExists, ...cartFilter];
-
-    await this.writeCarts(cartConcat);
-    return "Product was added to the cart";
   };
 }
 

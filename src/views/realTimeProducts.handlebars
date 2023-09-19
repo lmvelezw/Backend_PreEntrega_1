@@ -1,0 +1,42 @@
+<div id="formEntry">
+<input type="text" id="prodName" placeholder="Producto" />
+<input type="text" id="prodDescription" placeholder="Descripción" />
+<input type="text" id="prodCode" placeholder="Código" />
+<input type="text" id="prodPrice" placeholder="Precio" />
+<input type="text" id="prodStatus" placeholder="Status" />
+<input type="text" id="prodStock" placeholder="Stock" />
+<input type="text" id="prodCategory" placeholder="Categoría" />
+<button type="submit" id="boton" onclick="sendMessage()">Enviar</button>
+</div>
+
+<table>
+  <thead>
+    <tr>
+      <th>Producto</th>
+      <th>Descripción</th>
+      <th>Código</th>
+      <th>Precio</th>
+      <th>Status</th>
+      <th>Stock</th>
+      <th>Categoría</th>
+      <th>Id</th>
+    </tr>
+  </thead>
+  <tbody>
+    {{#each products}}
+      <tr>
+        <td>{{this.title}}</td>
+        <td>{{this.description}}</td>
+        <td>{{this.code}}</td>
+        <td>{{this.price}}</td>
+        <td>{{this.status}}</td>
+        <td>{{this.stock}}</td>
+        <td>{{this.category}}</td>
+        <td>{{this.id}}</td>
+      </tr>
+    {{/each}}
+  </tbody>
+</table>
+
+<script src="/socket.io/socket.io.js"></script>
+<script src="/js/index.js"></script>

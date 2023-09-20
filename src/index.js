@@ -25,17 +25,27 @@ app.set("view engine", "handlebars");
 app.set("views", path.resolve(__dirname + "/views"));
 app.use(express.static(__dirname + "/public"));
 
-// let productsList = product.getProducts()
 
 io.on('connection', (socket) => {
-  socket.emit("message",)
+  // socket.emit("message",)
   console.log("Cliente conectado")
+
+  
+  socket.on("newProduct", async (newEntry) => {
+    console.log("Received new product data from client:", newEntry);
+    await product.addProducts(newEntry)
+    console.log("Added new product to array:", newEntry);
+
+    io.emit('success',"Nuevo producto recibido desde el cliente." ) 
+
+  })
+  
 })
 
 app.get("/", async (req, res) => {
   let allProducts = await product.getProducts();
   res.render("home", {
-    title: "Products",
+    title: "Products with Handlebars",
     products: allProducts,
   });
 });
@@ -43,7 +53,7 @@ app.get("/", async (req, res) => {
 app.get("/realtimeproducts", async (req,res) => {
   let allProducts = await product.getProducts();
   res.render('realTimeProducts', {
-    title: "Products",
+    title: "Products with Websocket",
     products: allProducts,  
   })
 })

@@ -60,18 +60,18 @@ class ProductManager {
         );
       }
 
-      if (
-        typeof product.title !== "string" ||
-        typeof product.description !== "string" ||
-        typeof product.code !== "string" ||
-        typeof product.price !== "number" ||
-        typeof product.stock !== "number" ||
-        typeof product.category !== "string"
-      ) {
-        throw new BadRequestError(
-          "There is a field with error in the content type you are providing"
-        );
-      }
+      // if (
+      //   typeof product.title !== "string" ||
+      //   typeof product.description !== "string" ||
+      //   typeof product.code !== "string" ||
+      //   typeof product.price !== "number" ||
+      //   typeof product.stock !== "number" ||
+      //   typeof product.category !== "string"
+      // ) {
+      //   throw new BadRequestError(
+      //     "There is a field with error in the content type you are providing"
+      //   );
+      // }
 
       let oldProducts = await this.readProducts();
       product.id = nanoid();

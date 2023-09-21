@@ -11,11 +11,6 @@ const product = new ProductManager();
 const app = express();
 const PORT = 8080;
 
-const httpServer = app.listen(PORT, () =>
-  console.log(`Servidor en puerto ${PORT}`)
-);
-
-const io = new Server(httpServer);
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -25,23 +20,6 @@ app.set("view engine", "handlebars");
 app.set("views", path.resolve(__dirname + "/views"));
 app.use(express.static(__dirname + "/public"));
 
-
-io.on('connection', (socket) => {
-  // socket.emit("message",)
-  console.log("Cliente conectado")
-
-  
-  socket.on("newProduct", async (newEntry) => {
-    console.log("Received new product data from client:", newEntry);
-    await product.addProducts(newEntry)
-    console.log("Added new product to array:", newEntry);
-
-    io.emit('success',"Nuevo producto recibido desde el cliente." ) 
-
-  })
-  
-})
-
 app.get("/", async (req, res) => {
   let allProducts = await product.getProducts();
   res.render("home", {
@@ -50,13 +28,30 @@ app.get("/", async (req, res) => {
   });
 });
 
-app.get("/realtimeproducts", async (req,res) => {
+const httpServer = app.listen(PORT, () => {
+  console.log(`Servidor en puerto ${PORT}`);
+});
+
+const io = new Server(httpServer);
+
+io.on("connection", (socket) => {
+  console.log("Cliente conectado");
+
+  socket.on("newProduct", async (newEntry) => {
+    console.log("Received new product data from client:", newEntry);
+    console.log("Added new product to array:", newEntry);
+    await product.addProducts(newEntry);
+    io.emit("success", "Nuevo producto recibido desde el cliente.");
+  });
+});
+
+app.get("/realtimeproducts", async (req, res) => {
   let allProducts = await product.getProducts();
-  res.render('realTimeProducts', {
+  res.render("realtimeproducts", {
     title: "Products with Websocket",
-    products: allProducts,  
-  })
-})
+    products: allProducts
+  });
+});
 
 app.use("/api/products", ProductRouter);
 app.use("/api/cart", CartRouter);

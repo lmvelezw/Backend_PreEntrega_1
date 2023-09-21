@@ -10,11 +10,11 @@ document.getElementById("formEntry").addEventListener("submit", (e) => {
   let codeEntry = document.getElementById("prodCode");
   let code = codeEntry.value;
   let priceEntry = document.getElementById("prodPrice");
-  let price = Number(priceEntry.value);
+  let price = parseInt(priceEntry.value);
   let statusEntry = document.getElementById("prodStatus");
   let status = statusEntry.value;
   let stockEntry = document.getElementById("prodStock");
-  let stock = stockEntry.value;
+  let stock = parseInt(stockEntry.value);
   let categoryEntry = document.getElementById("prodCategory");
   let category = categoryEntry.value;
 
@@ -32,8 +32,6 @@ document.getElementById("formEntry").addEventListener("submit", (e) => {
   console.log("Sent new product data to server:", newProduct);
 });
 
-
-socket.on('newEntry', (message) => {
-    
-    console.log("New entry approved", message);
-  });
+socket.on("success", () => {
+  location.reload();
+});

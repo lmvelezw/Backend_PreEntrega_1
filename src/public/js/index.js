@@ -29,9 +29,28 @@ document.getElementById("formEntry").addEventListener("submit", (e) => {
   };
 
   socket.emit("newProduct", newProduct);
-  console.log("Sent new product data to server:", newProduct);
 });
 
-socket.on("success", () => {
-  location.reload();
+socket.on("success", (data) => {
+  Swal.fire({
+    icon: "success",
+    title: data,
+    text: "Product added to list",
+    confirmButtonText: "Aceptar",
+  }).then(location.reload());
+});
+
+document.querySelectorAll(".btnDelete").forEach((button) => {
+  button.addEventListener("click", (e) => {
+    e.preventDefault();
+    let productIDEntry = e.target.parentElement.previousElementSibling;
+    let productID = productIDEntry.textContent.trim();
+
+    socket.emit("deleteProduct", productID);
+    console.log("Producto para eliminar:", productID);
+  });
+});
+
+socket.on("deletedProduct", (data) => {
+  (location.reload(data));
 });

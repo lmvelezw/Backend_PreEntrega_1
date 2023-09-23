@@ -3,6 +3,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Products with Websocket</title>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
   </head>
   <body>
 
@@ -42,14 +43,14 @@
             <td>{{this.status}}</td>
             <td>{{this.stock}}</td>
             <td>{{this.category}}</td>
-            <td>{{this.id}}</td>
+            <td id="productID">{{this.id}}</td>
+            <td><button type="" class="btnDelete">Eliminar</button></td>
           </tr>
         {{/each}}
       </tbody>
     </table>
 
     <script src="/socket.io/socket.io.js"></script>
-    <script src="/js/index.js"></script>
 
   </body>
 </html>

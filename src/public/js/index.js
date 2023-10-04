@@ -1,56 +1,32 @@
-const socket = io();
-
-document.getElementById("formEntry").addEventListener("submit", (e) => {
+document.getElementById("chatFormEntry").addEventListener("submit", async (e) => {
   e.preventDefault();
 
-  let titleEntry = document.getElementById("prodName");
-  let title = titleEntry.value;
-  let descriptionEntry = document.getElementById("prodDescription");
-  let description = descriptionEntry.value;
-  let codeEntry = document.getElementById("prodCode");
-  let code = codeEntry.value;
-  let priceEntry = document.getElementById("prodPrice");
-  let price = parseInt(priceEntry.value);
-  let statusEntry = document.getElementById("prodStatus");
-  let status = statusEntry.value;
-  let stockEntry = document.getElementById("prodStock");
-  let stock = parseInt(stockEntry.value);
-  let categoryEntry = document.getElementById("prodCategory");
-  let category = categoryEntry.value;
+  let userNameEntry = document.getElementById("userName");
+  let userName = userNameEntry.value;
+  let messageEntry = document.getElementById("message");
+  let message = messageEntry.value;
 
-  let newProduct = {
-    title: title,
-    description: description,
-    code: code,
-    price: price,
-    status: status,
-    stock: stock,
-    category: category,
-  };
+  try {
+    const response = await fetch('/api/messages', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ user: userName, message: message })
+    });
 
-  socket.emit("newProduct", newProduct);
-});
+    const data = await response.json();
 
-socket.on("success", (data) => {
-  Swal.fire({
-    icon: "success",
-    title: data,
-    text: "Product added to list",
-    confirmButtonText: "Aceptar",
-  }).then(location.reload());
-});
+    if (data.result === 'success') {
+      const successMessageElement = document.getElementById('successMessage');
+      successMessageElement.textContent = 'Message posted successfully!';
+    } else {
+      console.error(data.error);
+    }
+  } catch (error) {
+    console.error(error);
+  }
 
-document.querySelectorAll(".btnDelete").forEach((button) => {
-  button.addEventListener("click", (e) => {
-    e.preventDefault();
-    let productIDEntry = e.target.parentElement.previousElementSibling;
-    let productID = productIDEntry.textContent.trim();
-
-    socket.emit("deleteProduct", productID);
-    console.log("Producto para eliminar:", productID);
-  });
-});
-
-socket.on("deletedProduct", (data) => {
-  (location.reload(data));
+  userNameEntry.value = "";
+  messageEntry.value = "";
 });

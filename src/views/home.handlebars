@@ -1,16 +1,14 @@
-{{#each products}}
+<h2>Chat</h2>
+<form id="chatFormEntry" action="/api/messages" method="POST">
+  <input type="text" id="userName" placeholder="User Name" required />
+  <input type="text" id="message" placeholder="Message" required />
+  <button type="submit" id="btn">Enviar</button>
+</form>
 
-  <ul>
-
-    <p>{{this.title}}</p>
-    <li>{{this.description}}</li>
-    <li>{{this.code}}</li>
-    <li>{{this.price}}</li>
-    <li>{{this.status}}</li>
-    <li>{{this.stock}}</li>
-    <li>{{this.category}}</li>
-    <li>{{this.id}}</li>
-
-  </ul>
-
-{{/each}}
+<div id="successMessage"></div>
+<H1>SUBIR ARCHIVOS</H1>
+<form action="/src/uploads" method="post" enctype="multipart/form-data">
+  <label for="archivo">Selecciona un archivo</label>
+  <input type="file" id="archivo" name="archivo" required />
+  <button type="submit">Subir archivo</button>
+</form>
